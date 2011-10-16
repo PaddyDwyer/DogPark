@@ -146,6 +146,10 @@ package
 			_bone= bone
 		}
 		
+		public function get bone():Boolean {
+			return _bone;
+		}
+		
 		public function set cookie(cookie:Boolean):void {
 			var img:Class = null;
 			if (cookie) {

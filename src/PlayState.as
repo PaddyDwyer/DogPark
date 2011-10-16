@@ -158,6 +158,18 @@ package
 						var special:Boolean = true;
 						while (tempArray.length > 0) {
 							index = tempArray.shift();
+							if (gems.members[index].bone) {
+								xTempArray = [];
+								xTempArray.push(index + 1);
+								xTempArray.push(index - 1);
+								xTempArray.push(index + 7);
+								xTempArray.push(index + 8);
+								xTempArray.push(index + 9);
+								xTempArray.push(index - 7);
+								xTempArray.push(index - 8);
+								xTempArray.push(index - 9);
+								deleteArray.push(xTempArray);
+							}
 							if (special && size == 4 && gems.members[index].justMoved){ //&& (index == moveObject.selectedIndex || index == moveObject.targetIndex)) {
 								special = false;
 								gems.members[index].bone = true;
@@ -214,18 +226,7 @@ package
 								movingGems.add(gem);
 							}
 						}
-//							var col:uint = (i - (i % 8)) / 8;
-//							if (colCount[col] == null) {
-//								colCount[col] = 1;
-//							} else {
-//								colCount[col]++;
-//							}
 					}
-					
-//					FlxG.log("replace");
-//					for (var key:String in colCount) {
-//						FlxG.log(key);
-//					}
 				}
 			}
 		}
