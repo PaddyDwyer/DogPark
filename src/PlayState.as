@@ -182,6 +182,10 @@ package
 						}
 					}
 					
+					gems.members.forEach(function(item:Gem, index:int, array:Array):void {
+						item.justMoved = false;
+					});
+					
 					size = gems.members.length;
 					var colCount:Object = {};
 					var drop:Boolean = false;
