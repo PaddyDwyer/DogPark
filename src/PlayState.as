@@ -75,7 +75,7 @@ package
 			selectBox.kill();
 			add(selectBox);
 			
-			gemTypes = [Gem.BOSTON, Gem.BERNARD, Gem.BOXER, Gem.ENGLISH, Gem.FRENCHY, Gem.PUG];
+			gemTypes = [Gem.BOSTON, Gem.BULLTERRIER, Gem.BOXER, Gem.ENGLISH, Gem.FRENCHY, Gem.PUG];
 			
 			startLevel();
 		}

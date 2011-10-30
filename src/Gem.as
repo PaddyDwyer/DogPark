@@ -9,9 +9,9 @@ package
 		[Embed(source="data/boston.png")] private var ImgBoston:Class;
 		[Embed(source="data/bostonbone.png")] private var ImgBostonBone:Class;
 		[Embed(source="data/bostoncookie.png")] private var ImgBostonCookie:Class;
-		[Embed(source="data/bernard.png")] private var ImgBernard:Class;
-		[Embed(source="data/bernardbone.png")] private var ImgBernardBone:Class;
-		[Embed(source="data/bernardcookie.png")] private var ImgBernardCookie:Class;
+		[Embed(source="data/bullterrier.png")] private var ImgBullTerrier:Class;
+		[Embed(source="data/bullterrierbone.png")] private var ImgBullTerrierBone:Class;
+		[Embed(source="data/bullterriercookie.png")] private var ImgBullTerrierCookie:Class;
 		[Embed(source="data/boxer.png")] private var ImgBoxer:Class;
 		[Embed(source="data/boxerbone.png")] private var ImgBoxerBone:Class;
 		[Embed(source="data/boxercookie.png")] private var ImgBoxerCookie:Class;
@@ -32,7 +32,7 @@ package
 		public var justMoved:Boolean = true;
 		
 		public static const BOSTON:Number = 0;
-		public static const BERNARD:Number = 1;
+		public static const BULLTERRIER:Number = 1;
 		public static const BOXER:Number = 2;
 		public static const ENGLISH:Number = 3;
 		public static const FRENCHY:Number = 4;
@@ -51,8 +51,8 @@ package
 			var img:Class = null;
 			if (Type == BOSTON) {
 				img = ImgBoston;
-			} else if (Type == BERNARD) {
-				img = ImgBernard;
+			} else if (Type == BULLTERRIER) {
+				img = ImgBullTerrier;
 			} else if (Type == BOXER) {
 				img = ImgBoxer;
 			} else if (Type == ENGLISH) {
@@ -130,8 +130,8 @@ package
 			if (bone) {
 				if (type == BOSTON) {
 					img = ImgBostonBone;
-				} else if (type == BERNARD) {
-					img = ImgBernardBone;
+				} else if (type == BULLTERRIER) {
+					img = ImgBullTerrierBone;
 				} else if (type == BOXER) {
 					img = ImgBoxerBone;
 				} else if (type == ENGLISH) {
@@ -155,8 +155,8 @@ package
 			if (cookie) {
 				if (type == BOSTON) {
 					img = ImgBostonCookie;
-				} else if (type == BERNARD) {
-					img = ImgBernardCookie;
+				} else if (type == BULLTERRIER) {
+					img = ImgBullTerrierCookie;
 				} else if (type == BOXER) {
 					img = ImgBoxerCookie;
 				} else if (type == ENGLISH) {
@@ -188,8 +188,8 @@ package
 			var img:Class = null;
 			if (Type == BOSTON) {
 				img = ImgBoston;
-			} else if (Type == BERNARD) {
-				img = ImgBernard;
+			} else if (Type == BULLTERRIER) {
+				img = ImgBullTerrier;
 			} else if (Type == BOXER) {
 				img = ImgBoxer;
 			} else if (Type == ENGLISH) {
