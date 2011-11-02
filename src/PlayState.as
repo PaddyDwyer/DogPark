@@ -193,9 +193,9 @@ package
 					var indexArray:Array = []; 
 					var dv:uint = 0;
 					for (i = size - 1, j = 0; i >= 0; i--, j++) {
-						FlxG.log("start loop, i: " + i + ", j: " + j);
+//						FlxG.log("start loop, i: " + i + ", j: " + j);
 						if (drop && gems.members[i].alive) {
-							FlxG.log("dropping " + i);
+//							FlxG.log("dropping " + i);
 							gems.members[i].velocity.y = 400 - dv;
 							gems.members[i].justMoved = true;
 							dv += 30;
@@ -206,29 +206,34 @@ package
 						if (!gems.members[i]) {
 							indexArray.push(i);
 						} else if (!gems.members[i].alive) {
-							FlxG.log("found dead " + i);
+//							FlxG.log("found dead " + i);
 							indexArray.push(i);
 							tempArray.push(gems.members[i]);
 							gems.members[i] = null;
 							drop = true;
 						}
 						if (j == 7) {
-							FlxG.log("end of col");
+//							FlxG.log("end of col");
 							drop = false;
 							j = -1;
-							dv = 0;
+//							var debug:int = 0;
+							var indexLength:int = indexArray.length;
 							while (tempArray.length > 0) {
 								var gem:Gem = tempArray.pop();
 								var idx:uint = indexArray.shift();
 								gem.targetIdx = idx;
 								var x:uint = (idx - (idx % 8)) / 8;
 								var y:uint = (idx % 8);
-								gem.reset(192 + ( x * 64), -800 + (y * 80));
+								gem.reset(192 + ( x * 64), (-96 * indexLength) + (y * 80));
 								gem.setType(FlxG.getRandom(gemTypes) as Number);
-								gem.velocity.y = 400;
+//								gem.setType(debug++);
+								gem.velocity.y = 400 - dv;
+								dv += 30;
 								gem.justMoved = true;
+								FlxG.log("target: " + gem.targetIdx + ", t: " + gem.type + ", x: " + x + ", y: " + y);
 								movingGems.add(gem);
 							}
+							dv = 0;
 						}
 					}
 				}
