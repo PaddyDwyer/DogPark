@@ -84,8 +84,8 @@ package
 			super.update();
 			PlayState.collide(gems, map);
 			PlayState.collide(gems, gems);
-			PlayState.collide(movingGems, map);
-			PlayState.collide(movingGems, gems);
+//			PlayState.collide(movingGems, map);
+//			PlayState.collide(movingGems, gems);
 			
 			if (justMoved && movingGems.length == 0) {
 				justMoved = false;
@@ -190,13 +190,13 @@ package
 					var colCount:Object = {};
 					var drop:Boolean = false;
 					tempArray = [];
-					var indexArray:Array = []; 
+					var indexArray:Array = [];
 					var dv:uint = 0;
 					for (i = size - 1, j = 0; i >= 0; i--, j++) {
 //						FlxG.log("start loop, i: " + i + ", j: " + j);
 						if (drop && gems.members[i].alive) {
 //							FlxG.log("dropping " + i);
-							gems.members[i].velocity.y = 400 - dv;
+//							gems.members[i].velocity.y = 400 - dv;
 							gems.members[i].justMoved = true;
 							dv += 30;
 							gems.members[i].targetIdx = indexArray.shift();
@@ -227,7 +227,7 @@ package
 								gem.reset(192 + ( x * 64), (-96 * indexLength) + (y * 80));
 								gem.setType(FlxG.getRandom(gemTypes) as Number);
 //								gem.setType(debug++);
-								gem.velocity.y = 400 - dv;
+//								gem.velocity.y = 400 - dv;
 								dv += 30;
 								gem.justMoved = true;
 								FlxG.log("target: " + gem.targetIdx + ", t: " + gem.type + ", x: " + x + ", y: " + y);

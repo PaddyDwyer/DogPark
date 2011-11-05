@@ -1,6 +1,7 @@
 package
 {
 	import flash.events.MouseEvent;
+	import flash.net.drm.VoucherAccessInfo;
 	
 	import org.flixel.*;
 	
@@ -73,6 +74,12 @@ package
 		
 		override public function preUpdate():void {
 			super.preUpdate();
+			if (pathSpeed == 0 && path != null) {
+				stopFollowingPath(true);
+				velocity.x = 0;
+				velocity.y = 0;
+				state.onGemFinishedMoving(this);
+			}
 			
 			if (!initialized) {
 				if(FlxG.stage != null)
@@ -84,10 +91,10 @@ package
 		}
 		
 		override public function update():void {
-			if (justTouched(UP | RIGHT | DOWN | LEFT)) {
-				state.onGemFinishedMoving(this);
+//			if (justTouched(UP | RIGHT | DOWN | LEFT)) {
+//				state.onGemFinishedMoving(this);
 //				immovable = true;
-			}
+//			}
 			var offAll:Boolean = true;
 			if (overlapsPoint(FlxG.mouse.getWorldPosition())) {
 				offAll = false;
