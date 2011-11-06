@@ -151,7 +151,7 @@ package
 				if (deleteArray.length == 0) {
 					FlxG.log("invalid move");
 				} else {
-					justMoved = true;
+//					justMoved = true;
 					while(deleteArray.length > 0) {
 						var tempArray:Array = deleteArray.shift();
 						var size:uint = tempArray.length;
@@ -193,48 +193,73 @@ package
 					var indexArray:Array = [];
 					var dv:uint = 0;
 					for (i = size - 1, j = 0; i >= 0; i--, j++) {
-//						FlxG.log("start loop, i: " + i + ", j: " + j);
-						if (drop && gems.members[i].alive) {
-//							FlxG.log("dropping " + i);
-//							gems.members[i].velocity.y = 400 - dv;
-							gems.members[i].justMoved = true;
-							dv += 30;
-							gems.members[i].targetIdx = indexArray.shift();
-							movingGems.add(gems.members[i]);
-							gems.members[i] = null;
-						}
-						if (!gems.members[i]) {
-							indexArray.push(i);
-						} else if (!gems.members[i].alive) {
-//							FlxG.log("found dead " + i);
-							indexArray.push(i);
-							tempArray.push(gems.members[i]);
-							gems.members[i] = null;
+						var gem:Gem = gems.members[i];
+						if (!gem.alive) {
 							drop = true;
+							indexArray.push(gem.getMidpoint());
+						} else if (drop && gem.alive) {
+							indexArray.push(gem.getMidpoint());
+							gem.followPath(new FlxPath([indexArray.shift()]), 400);
 						}
+						
 						if (j == 7) {
-//							FlxG.log("end of col");
 							drop = false;
 							j = -1;
-//							var debug:int = 0;
 							var indexLength:int = indexArray.length;
-							while (tempArray.length > 0) {
-								var gem:Gem = tempArray.pop();
-								var idx:uint = indexArray.shift();
-								gem.targetIdx = idx;
-								var x:uint = (idx - (idx % 8)) / 8;
-								var y:uint = (idx % 8);
-								gem.reset(192 + ( x * 64), (-96 * indexLength) + (y * 80));
+							
+							for (var k:int = 0; k < indexLength; k++) {
+								gem = gems.recycle() as Gem;
+								var point:FlxPoint = indexArray.shift();
+								trace("start point", "y", (point.y - 32) - 640, "ey", point.y - 32, "ty", (point.y - 32) - ((indexLength + 1) * 64));
+								gem.reset(point.x - 32, (point.y - 32) - ((indexLength + 1) * 64));
 								gem.setType(FlxG.getRandom(gemTypes) as Number);
+								gem.followPath(new FlxPath([point]), 400);
+							}
+						}
+						
+						
+//						if (drop && gems.members[i].alive) {
+//							FlxG.log("dropping " + i);
+//							gems.members[i].velocity.y = 400 - dv;
+//							gems.members[i].justMoved = true;
+//							dv += 30;
+//							gems.members[i].targetIdx = indexArray.shift();
+//							movingGems.add(gems.members[i]);
+//							gems.members[i] = null;
+//						}
+						
+//						if (!gems.members[i]) {
+//							indexArray.push(i);
+//						} else if (!gems.members[i].alive) {
+//							FlxG.log("found dead " + i);
+//							indexArray.push(i);
+//							tempArray.push(gems.members[i]);
+//							gems.members[i] = null;
+//						}
+						
+//						if (j == 7) {
+//							FlxG.log("end of col");
+//							drop = false;
+//							j = -1;
+//							var debug:int = 0;
+//							var indexLength:int = indexArray.length;
+//							while (tempArray.length > 0) {
+//								var gem:Gem = tempArray.pop();
+//								var idx:uint = indexArray.shift();
+//								gem.targetIdx = idx;
+//								var x:uint = (idx - (idx % 8)) / 8;
+//								var y:uint = (idx % 8);
+//								gem.reset(192 + ( x * 64), (-96 * indexLength) + (y * 80));
+//								gem.setType(FlxG.getRandom(gemTypes) as Number);
 //								gem.setType(debug++);
 //								gem.velocity.y = 400 - dv;
-								dv += 30;
-								gem.justMoved = true;
-								FlxG.log("target: " + gem.targetIdx + ", t: " + gem.type + ", x: " + x + ", y: " + y);
-								movingGems.add(gem);
-							}
-							dv = 0;
-						}
+//								dv += 30;
+//								gem.justMoved = true;
+//								FlxG.log("target: " + gem.targetIdx + ", t: " + gem.type + ", x: " + x + ", y: " + y);
+//								movingGems.add(gem);
+//							}
+//							dv = 0;
+//						}
 					}
 				}
 			}

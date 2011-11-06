@@ -112,6 +112,7 @@ package
 		
 		protected function onMouseUp(event:MouseEvent):void {
 			if (status == PRESSED) {
+				trace(event.stageX, event.stageY);
 				state.onSelectGem(this);
 			}
 		}
