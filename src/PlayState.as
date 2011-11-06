@@ -216,8 +216,11 @@ package
 							for (var k:int = 0; k < indexLength; k++) {
 								gem = gems.recycle() as Gem;
 								var point:FlxPoint = indexArray.shift();
-//								trace("start point", "y", (point.y - 32) - 640, "ey", point.y - 32, "ty", (point.y - 32) - ((indexLength + 1) * 64));
-								gem.reset(point.x - 32, (point.y - 32) - ((indexLength + 1) * 64));
+								var n:int  = k + 1;
+								var c:int = 2 * indexLength + 3;
+								var off:int = (c * n - n * n) / 2;
+								trace("start point", "off", off);
+								gem.reset(point.x - 32, (point.y - 32) - (off * 64));
 								gem.setType(FlxG.getRandom(gemTypes) as Number);
 								gem.followPath(new FlxPath([point]), 400);
 								moveCount++;
