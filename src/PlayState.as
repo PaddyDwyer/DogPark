@@ -94,7 +94,7 @@ package
 //					}
 //					trace(s);
 //				}
-//				gems.removeSort();
+				gems.removeSort();
 //				trace("after sort");
 //				for (var i:int = 0; i < 8; i++) {
 //					var s:String = "";
