@@ -16,7 +16,6 @@ package
 		public var delay:FlxTimer;
 		
 		private var selectedGem:Gem;
-//		private var movingGems:FlxGroup;
 		private var moveCount:int = 0;
 		private var justMoved:Boolean;
 		
@@ -63,16 +62,12 @@ package
 			var csv:String = FlxTilemap.arrayToCSV(data, 24);
 			map = new FlxTilemap().loadMap(csv, ImgTiles);
 			map.setTileProperties(2, FlxObject.DOWN);
-//			FlxG.log(map.getTile(6, 1));
 			add(map);
 
 			gems = new GemHolder();
 			add(gems);
 			
 			moveCount = 0;
-			
-//			movingGems = new FlxGroup();
-//			add(movingGems);
 			
 			selectBox = new FlxSprite(0, 0, ImgSelect);
 			selectBox.kill();
@@ -87,29 +82,27 @@ package
 			super.update();
 			GemCollision.collide(gems, map);
 			GemCollision.collide(gems, gems);
-//			PlayState.collide(movingGems, map);
-//			PlayState.collide(movingGems, gems);
 			
 			if (justMoved && moveCount == 0) {
 				justMoved = false;
 				var deleteArray:Array = [];
-				trace("Before sort");
-				for (var i:int = 0; i < 8; i++) {
-					var s:String = "";
-					for (var j:int = 0; j < 8; j++) {
-						s += gems.members[i + (j * 8)].type + " ";
-					}
-					trace(s);
-				}
-				gems.removeSort();
-				trace("after sort");
-				for (var i:int = 0; i < 8; i++) {
-					var s:String = "";
-					for (var j:int = 0; j < 8; j++) {
-						s += gems.members[i + (j * 8)].type + " ";
-					}
-					trace(s);
-				}
+//				trace("Before sort");
+//				for (var i:int = 0; i < 8; i++) {
+//					var s:String = "";
+//					for (var j:int = 0; j < 8; j++) {
+//						s += gems.members[i + (j * 8)].type + " ";
+//					}
+//					trace(s);
+//				}
+//				gems.removeSort();
+//				trace("after sort");
+//				for (var i:int = 0; i < 8; i++) {
+//					var s:String = "";
+//					for (var j:int = 0; j < 8; j++) {
+//						s += gems.members[i + (j * 8)].type + " ";
+//					}
+//					trace(s);
+//				}
 				for (var i:int = 0; i < 8; i++) {
 					var xLast:Number = -1;
 					var xCount:Number = 1;
@@ -239,7 +232,6 @@ package
 			for (var x:int = 0; x < 8; x++) {
 				for (var y:int = 0; y < 8; y++) {
 					gems.add(new Gem(192 + ( x * 64), -800 + (y * 80), FlxG.getRandom(gemTypes) as Number, this, (x * 8) + j));
-//					moveCount++;
 				}
 			}
 			for (var i:int = 0; i < 8; i++) {
@@ -253,7 +245,6 @@ package
 					if (type == xLast) {
 						xCount += 1;
 						if (xCount == 3) {
-//							FlxG.log("replace " + ((i * 8) + j));
 							gems.members[(i * 8) + j] = new Gem(192 + ( i * 64), -800 + (j * 80), FlxG.getRandom(gemTypes) as Number, this, (i * 8) + j);
 							i = 0;
 							j = 0;
@@ -268,7 +259,6 @@ package
 					if (type == yLast) {
 						yCount += 1;
 						if (yCount == 3) {
-//							FlxG.log("replace " + (i + (j * 8)));
 							gems.members[i + (j * 8)] = new Gem(192 + (j * 64), -800 + (i * 80), FlxG.getRandom(gemTypes) as Number, this, i + (j * 8));
 							i = 0;
 							j = 0;
@@ -319,12 +309,6 @@ package
 					path.addPoint(selectedGem.getMidpoint());
 					target.followPath(path, 100);
 					target.justMoved = true;
-//					moveObject.selected = selectedGem;
-//					target.targetIdx = gems.removeWithIndex(selectedGem);
-//					moveObject.target = target;
-//					selectedGem.targetIdx = gems.removeWithIndex(target);
-//					movingGems.add(target);
-//					movingGems.add(selectedGem);
 					moveCount = 2;
 					deselectGem();
 					justMoved = true;
@@ -337,9 +321,6 @@ package
 		
 		public function onGemFinishedMoving(gem:Gem):void
 		{
-//			FlxG.log("finished moving");
-//			movingGems.remove(gem, true);
-//			gems.addWithIndex(gem, gem.targetIdx);
 			moveCount--;
 		}
 	}
