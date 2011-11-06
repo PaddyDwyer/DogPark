@@ -82,5 +82,9 @@ package
 			}
 			return null;
 		}
+		
+		public function removeSort():void {
+			members.sortOn(["x", "y"], Array.NUMERIC);
+		}
 	}
 }

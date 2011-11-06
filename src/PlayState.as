@@ -16,7 +16,8 @@ package
 		public var delay:FlxTimer;
 		
 		private var selectedGem:Gem;
-		private var movingGems:FlxGroup;
+//		private var movingGems:FlxGroup;
+		private var moveCount:int = 0;
 		private var justMoved:Boolean;
 		
 		private var data:Array = new Array(
@@ -68,8 +69,10 @@ package
 			gems = new GemHolder();
 			add(gems);
 			
-			movingGems = new FlxGroup();
-			add(movingGems);
+			moveCount = 0;
+			
+//			movingGems = new FlxGroup();
+//			add(movingGems);
 			
 			selectBox = new FlxSprite(0, 0, ImgSelect);
 			selectBox.kill();
@@ -87,17 +90,26 @@ package
 //			PlayState.collide(movingGems, map);
 //			PlayState.collide(movingGems, gems);
 			
-			if (justMoved && movingGems.length == 0) {
+			if (justMoved && moveCount == 0) {
 				justMoved = false;
 				var deleteArray:Array = [];
-//				FlxG.log("Before check");
-//				for (var i:int = 0; i < 8; i++) {
-//					var s:String = "";
-//					for (var j:int = 0; j < 8; j++) {
-//						s += gems.members[i + (j * 8)].type + " ";
-//					}
-//					FlxG.log(s);
-//				}
+				trace("Before sort");
+				for (var i:int = 0; i < 8; i++) {
+					var s:String = "";
+					for (var j:int = 0; j < 8; j++) {
+						s += gems.members[i + (j * 8)].type + " ";
+					}
+					trace(s);
+				}
+				gems.removeSort();
+				trace("after sort");
+				for (var i:int = 0; i < 8; i++) {
+					var s:String = "";
+					for (var j:int = 0; j < 8; j++) {
+						s += gems.members[i + (j * 8)].type + " ";
+					}
+					trace(s);
+				}
 				for (var i:int = 0; i < 8; i++) {
 					var xLast:Number = -1;
 					var xCount:Number = 1;
@@ -151,7 +163,7 @@ package
 				if (deleteArray.length == 0) {
 					FlxG.log("invalid move");
 				} else {
-//					justMoved = true;
+					justMoved = true;
 					while(deleteArray.length > 0) {
 						var tempArray:Array = deleteArray.shift();
 						var size:uint = tempArray.length;
@@ -170,10 +182,10 @@ package
 								xTempArray.push(index - 9);
 								deleteArray.push(xTempArray);
 							}
-							if (special && size == 4 && gems.members[index].justMoved){ //&& (index == moveObject.selectedIndex || index == moveObject.targetIndex)) {
+							if (special && size == 4 && gems.members[index].justMoved){
 								special = false;
 								gems.members[index].bone = true;
-							} else if (special && size == 5 && gems.members[index].justMoved){ //&& (index == moveObject.selectedIndex || index == moveObject.targetIndex)) {
+							} else if (special && size == 5 && gems.members[index].justMoved){
 								special = false;
 								gems.members[index].cookie = true;
 							} else {
@@ -200,6 +212,7 @@ package
 						} else if (drop && gem.alive) {
 							indexArray.push(gem.getMidpoint());
 							gem.followPath(new FlxPath([indexArray.shift()]), 400);
+							moveCount++;
 						}
 						
 						if (j == 7) {
@@ -210,56 +223,13 @@ package
 							for (var k:int = 0; k < indexLength; k++) {
 								gem = gems.recycle() as Gem;
 								var point:FlxPoint = indexArray.shift();
-								trace("start point", "y", (point.y - 32) - 640, "ey", point.y - 32, "ty", (point.y - 32) - ((indexLength + 1) * 64));
+//								trace("start point", "y", (point.y - 32) - 640, "ey", point.y - 32, "ty", (point.y - 32) - ((indexLength + 1) * 64));
 								gem.reset(point.x - 32, (point.y - 32) - ((indexLength + 1) * 64));
 								gem.setType(FlxG.getRandom(gemTypes) as Number);
 								gem.followPath(new FlxPath([point]), 400);
+								moveCount++;
 							}
 						}
-						
-						
-//						if (drop && gems.members[i].alive) {
-//							FlxG.log("dropping " + i);
-//							gems.members[i].velocity.y = 400 - dv;
-//							gems.members[i].justMoved = true;
-//							dv += 30;
-//							gems.members[i].targetIdx = indexArray.shift();
-//							movingGems.add(gems.members[i]);
-//							gems.members[i] = null;
-//						}
-						
-//						if (!gems.members[i]) {
-//							indexArray.push(i);
-//						} else if (!gems.members[i].alive) {
-//							FlxG.log("found dead " + i);
-//							indexArray.push(i);
-//							tempArray.push(gems.members[i]);
-//							gems.members[i] = null;
-//						}
-						
-//						if (j == 7) {
-//							FlxG.log("end of col");
-//							drop = false;
-//							j = -1;
-//							var debug:int = 0;
-//							var indexLength:int = indexArray.length;
-//							while (tempArray.length > 0) {
-//								var gem:Gem = tempArray.pop();
-//								var idx:uint = indexArray.shift();
-//								gem.targetIdx = idx;
-//								var x:uint = (idx - (idx % 8)) / 8;
-//								var y:uint = (idx % 8);
-//								gem.reset(192 + ( x * 64), (-96 * indexLength) + (y * 80));
-//								gem.setType(FlxG.getRandom(gemTypes) as Number);
-//								gem.setType(debug++);
-//								gem.velocity.y = 400 - dv;
-//								dv += 30;
-//								gem.justMoved = true;
-//								FlxG.log("target: " + gem.targetIdx + ", t: " + gem.type + ", x: " + x + ", y: " + y);
-//								movingGems.add(gem);
-//							}
-//							dv = 0;
-//						}
 					}
 				}
 			}
@@ -269,6 +239,7 @@ package
 			for (var x:int = 0; x < 8; x++) {
 				for (var y:int = 0; y < 8; y++) {
 					gems.add(new Gem(192 + ( x * 64), -800 + (y * 80), FlxG.getRandom(gemTypes) as Number, this, (x * 8) + j));
+//					moveCount++;
 				}
 			}
 			for (var i:int = 0; i < 8; i++) {
@@ -349,11 +320,12 @@ package
 					target.followPath(path, 100);
 					target.justMoved = true;
 //					moveObject.selected = selectedGem;
-					target.targetIdx = gems.removeWithIndex(selectedGem);
+//					target.targetIdx = gems.removeWithIndex(selectedGem);
 //					moveObject.target = target;
-					selectedGem.targetIdx = gems.removeWithIndex(target);
-					movingGems.add(target);
-					movingGems.add(selectedGem);
+//					selectedGem.targetIdx = gems.removeWithIndex(target);
+//					movingGems.add(target);
+//					movingGems.add(selectedGem);
+					moveCount = 2;
 					deselectGem();
 					justMoved = true;
 				} else {
@@ -366,8 +338,9 @@ package
 		public function onGemFinishedMoving(gem:Gem):void
 		{
 //			FlxG.log("finished moving");
-			movingGems.remove(gem, true);
-			gems.addWithIndex(gem, gem.targetIdx);
+//			movingGems.remove(gem, true);
+//			gems.addWithIndex(gem, gem.targetIdx);
+			moveCount--;
 		}
 	}
 }

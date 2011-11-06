@@ -41,6 +41,14 @@ package
 			if(Object2 is FlxTilemap)
 				return (Object2 as FlxTilemap).overlapsWithCallback(Object1,separateX,true);
 			
+			if (Object1 is Gem && Object2 is Gem) {
+				var g1:Gem = Object1 as Gem;
+				var g2:Gem = Object2 as Gem;
+				if (g1.velocity.x > 0 && g1.velocity.x == -g2.velocity.x) {
+					return false;
+				}
+			}
+			
 			//First, get the two object deltas
 			var overlap:Number = 0;
 			var obj1delta:Number = Object1.x - Object1.last.x;
@@ -124,6 +132,14 @@ package
 				return (Object1 as FlxTilemap).overlapsWithCallback(Object2,separateY);
 			if(Object2 is FlxTilemap)
 				return (Object2 as FlxTilemap).overlapsWithCallback(Object1,separateY,true);
+			
+			if (Object1 is Gem && Object2 is Gem) {
+				var g1:Gem = Object1 as Gem;
+				var g2:Gem = Object2 as Gem;
+				if (g1.velocity.y > 0 && g1.velocity.y == -g2.velocity.y) {
+					return false;
+				}
+			}
 			
 			//First, get the two object deltas
 			var overlap:Number = 0;
