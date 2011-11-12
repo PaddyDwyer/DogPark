@@ -49,6 +49,7 @@ package
 		
 		public function Gem(X:Number, Y:Number, Type:Number, State:PlayState, Index:uint)
 		{
+			super(X, Y);
 			var img:Class = null;
 			if (Type == BOSTON) {
 				img = ImgBoston;
@@ -63,7 +64,14 @@ package
 			} else if (Type == PUG) {
 				img = ImgPug;
 			}
-			super(X, Y, img);
+			
+			loadGraphic(img, true, false, 64, 64);
+			frame = 0;
+			
+//			if (Type == BOSTON) {
+				addAnimation("farty", [1, 2, 3, 4, 5], 30);
+				addAnimationCallback(endFart);
+//			}
 
 			type = Type;
 			velocity.y = 400;
@@ -90,6 +98,10 @@ package
 			}
 		}
 		
+		public function initialize():void {
+			FlxG.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+		}
+		
 		override public function update():void {
 //			if (justTouched(UP | RIGHT | DOWN | LEFT)) {
 //				state.onGemFinishedMoving(this);
@@ -108,6 +120,19 @@ package
 			
 			
 			super.update();
+		}
+		
+		override public function kill():void {
+			play("farty");
+//			state.onGemDied(this);
+//			super.kill();
+		}
+		
+		private function endFart(name:String, frameNo:uint, frameIdx:uint):void {
+			if (name == "farty" && frameIdx == 5) {
+				state.onGemDied(this);
+				super.kill();
+			}
 		}
 		
 		protected function onMouseUp(event:MouseEvent):void {
@@ -149,7 +174,8 @@ package
 				} else if (type == PUG) {
 					img = ImgPugBone;
 				}
-				loadGraphic(img);
+				loadGraphic(img, true, false, 64, 64);
+				frame = 0;
 			}
 			_bone= bone
 		}
@@ -174,7 +200,8 @@ package
 				} else if (type == PUG) {
 					img = ImgPugCookie;
 				}
-				loadGraphic(img);
+				loadGraphic(img, true, false, 64, 64);
+				frame = 0;
 			}
 			_cookie = cookie;
 		}
@@ -207,7 +234,8 @@ package
 			} else if (Type == PUG) {
 				img = ImgPug;
 			}
-			loadGraphic(img);
+			loadGraphic(img, true, false, 64, 64);
+			frame = 0;
 		}
 	}
 }

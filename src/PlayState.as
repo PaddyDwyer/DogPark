@@ -1,5 +1,9 @@
 package
 {
+	import idv.cjcat.fenofsm.*;
+	import idv.cjcat.fenofsm.events.StateEvent;
+	import idv.cjcat.fenofsm.events.TransitionEvent;
+	
 	import org.flixel.*;
 	
 	public class PlayState extends FlxState
@@ -17,7 +21,9 @@ package
 		
 		private var selectedGem:Gem;
 		private var moveCount:int = 0;
+		private var destroyCount:int = 0;
 		private var justMoved:Boolean;
+		private var fsm:FSMachine;
 		
 		private var data:Array = new Array(
 			3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -76,160 +82,133 @@ package
 			
 			gemTypes = [Gem.BOSTON, Gem.BULLTERRIER, Gem.BOXER, Gem.ENGLISH, Gem.FRENCHY, Gem.PUG];
 			
+			setUpFSM();
+			
 			startLevel();
 		}
 		
+		private function setUpFSM():void {
+			fsm = new FSMachine("start");
+			var start:State = fsm.initState;
+			
+			var ready:State = fsm.createState("ready");
+			var moving:State = fsm.createState("moving");
+			var checkValid:State = fsm.createState("checkValid");
+			var destroyGems:State = fsm.createState("destroyGems");
+			var dropGems:State = fsm.createState("dropGems");
+			var dropCheckValid:State = fsm.createState("dropCheckValid");
+			
+			var initialize:Transition = fsm.createTransition(start, ready, "initialize", "start2ready");
+			var click:Transition = fsm.createTransition(ready, moving, "click", "ready2moving");
+			var endOfMove:Transition = fsm.createTransition(moving, checkValid, "endOfMove", "moving2checkValid");
+			var validMove:Transition = fsm.createTransition(checkValid, destroyGems, "valid", "checkValid2destroyGems", 0.05);
+			var invalidMove:Transition = fsm.createTransition(checkValid, ready, "invalid", "checkValid2undoMove");
+			var droppingGems:Transition = fsm.createTransition(destroyGems, dropGems, "drop", "destroy2drop", 0.05);
+			var dropEndOfMove:Transition = fsm.createTransition(dropGems, dropCheckValid, "endOfMove", "dropGems2checkValid");
+			var dropValid:Transition = fsm.createTransition(dropCheckValid, destroyGems, "valid", "dropCheckValid2destroyGems", 0.05);
+			var dropInvalid:Transition = fsm.createTransition(dropCheckValid, ready, "invalid", "dropInvalid2ready");
+			
+			checkValid.addEventListener(StateEvent.ENTER, checkValidCallback, false, 0, true);
+			destroyGems.addEventListener(StateEvent.ENTER, destroyGemsCallback, false, 0, true);
+			dropGems.addEventListener(StateEvent.ENTER, dropGemsCallback, false, 0, true);
+			dropCheckValid.addEventListener(StateEvent.ENTER, checkValidCallback, false, 0, true);
+		}
+				
 		override public function update():void {
+			if (fsm.currentState.name == "start" && FlxG.stage != null) {
+				fsm.input("initialize");
+			}
 			super.update();
 			GemCollision.collide(gems, map);
 			GemCollision.collide(gems, gems);
 			
-			if (justMoved && moveCount == 0) {
-				justMoved = false;
-				var deleteArray:Array = [];
-//				trace("Before sort");
+//			if (fsm.currentState.name == "checkValid") {
+//				var deleteArray:Array = [];
+////				trace("Before sort");
+////				for (var i:int = 0; i < 8; i++) {
+////					var s:String = "";
+////					for (var j:int = 0; j < 8; j++) {
+////						s += gems.members[i + (j * 8)].type + " ";
+////					}
+////					trace(s);
+////				}
+//				gems.removeSort();
+////				trace("after sort");
+////				for (var i:int = 0; i < 8; i++) {
+////					var s:String = "";
+////					for (var j:int = 0; j < 8; j++) {
+////						s += gems.members[i + (j * 8)].type + " ";
+////					}
+////					trace(s);
+////				}
 //				for (var i:int = 0; i < 8; i++) {
-//					var s:String = "";
+//					var xLast:Number = -1;
+//					var xCount:Number = 1;
+//					var xTempArray:Array = [];
+//					
+//					var yLast:Number = -1;
+//					var yCount:Number = 1;
+//					var yTempArray:Array = [];
+//					
 //					for (var j:int = 0; j < 8; j++) {
-//						s += gems.members[i + (j * 8)].type + " ";
+//						// Check Columns
+//						var index:uint = (i * 8) + j;
+//						var type:Number = gems.members[index].type;
+//						if (type == xLast) {
+//							xCount += 1;
+//						} else {
+//							if (xCount >= 3) {
+//								deleteArray.push(xTempArray);
+//							}
+//							xLast = type;
+//							xCount = 1;
+//							xTempArray = [];
+//						}
+//						xTempArray.push(index);
+//						
+//						// Check Rows
+//						index = i + (j * 8);
+//						type = gems.members[index].type;
+//						if (type == yLast) {
+//							yCount += 1;
+//						} else {
+//							if (yCount >= 3) {
+//								deleteArray.push(yTempArray);
+//							}
+//							yLast = type;
+//							yCount  = 1;
+//							yTempArray = [];
+//						}
+//						yTempArray.push(index);
 //					}
-//					trace(s);
-//				}
-				gems.removeSort();
-//				trace("after sort");
-//				for (var i:int = 0; i < 8; i++) {
-//					var s:String = "";
-//					for (var j:int = 0; j < 8; j++) {
-//						s += gems.members[i + (j * 8)].type + " ";
+//					
+//					if (xCount >= 3) {
+//						deleteArray.push(xTempArray);
 //					}
-//					trace(s);
+//					
+//					if (yCount >= 3) {
+//						deleteArray.push(yTempArray);
+//					}
 //				}
-				for (var i:int = 0; i < 8; i++) {
-					var xLast:Number = -1;
-					var xCount:Number = 1;
-					var xTempArray:Array = [];
-					
-					var yLast:Number = -1;
-					var yCount:Number = 1;
-					var yTempArray:Array = [];
-					
-					for (var j:int = 0; j < 8; j++) {
-						// Check Columns
-						var index:uint = (i * 8) + j;
-						var type:Number = gems.members[index].type;
-						if (type == xLast) {
-							xCount += 1;
-						} else {
-							if (xCount >= 3) {
-								deleteArray.push(xTempArray);
-							}
-							xLast = type;
-							xCount = 1;
-							xTempArray = [];
-						}
-						xTempArray.push(index);
-						
-						// Check Rows
-						index = i + (j * 8);
-						type = gems.members[index].type;
-						if (type == yLast) {
-							yCount += 1;
-						} else {
-							if (yCount >= 3) {
-								deleteArray.push(yTempArray);
-							}
-							yLast = type;
-							yCount  = 1;
-							yTempArray = [];
-						}
-						yTempArray.push(index);
-					}
-					
-					if (xCount >= 3) {
-						deleteArray.push(xTempArray);
-					}
-					
-					if (yCount >= 3) {
-						deleteArray.push(yTempArray);
-					}
-				}
-				
-				if (deleteArray.length == 0) {
-					FlxG.log("invalid move");
-				} else {
-					justMoved = true;
-					while(deleteArray.length > 0) {
-						var tempArray:Array = deleteArray.shift();
-						var size:uint = tempArray.length;
-						var special:Boolean = true;
-						while (tempArray.length > 0) {
-							index = tempArray.shift();
-							if (gems.members[index].bone) {
-								xTempArray = [];
-								xTempArray.push(index + 1);
-								xTempArray.push(index - 1);
-								xTempArray.push(index + 7);
-								xTempArray.push(index + 8);
-								xTempArray.push(index + 9);
-								xTempArray.push(index - 7);
-								xTempArray.push(index - 8);
-								xTempArray.push(index - 9);
-								deleteArray.push(xTempArray);
-							}
-							if (special && size == 4 && gems.members[index].justMoved){
-								special = false;
-								gems.members[index].bone = true;
-							} else if (special && size == 5 && gems.members[index].justMoved){
-								special = false;
-								gems.members[index].cookie = true;
-							} else {
-								gems.members[index].kill();
-							}
-						}
-					}
-					
-					gems.members.forEach(function(item:Gem, index:int, array:Array):void {
-						item.justMoved = false;
-					});
-					
-					size = gems.members.length;
-					var colCount:Object = {};
-					var drop:Boolean = false;
-					tempArray = [];
-					var indexArray:Array = [];
-					var dv:uint = 0;
-					for (i = size - 1, j = 0; i >= 0; i--, j++) {
-						var gem:Gem = gems.members[i];
-						if (!gem.alive) {
-							drop = true;
-							indexArray.push(gem.getMidpoint());
-						} else if (drop && gem.alive) {
-							indexArray.push(gem.getMidpoint());
-							gem.followPath(new FlxPath([indexArray.shift()]), 400);
-							moveCount++;
-						}
-						
-						if (j == 7) {
-							drop = false;
-							j = -1;
-							var indexLength:int = indexArray.length;
-							
-							for (var k:int = 0; k < indexLength; k++) {
-								gem = gems.recycle() as Gem;
-								var point:FlxPoint = indexArray.shift();
-								var n:int  = k + 1;
-								var c:int = 2 * indexLength + 3;
-								var off:int = (c * n - n * n) / 2;
-								trace("start point", "off", off);
-								gem.reset(point.x - 32, (point.y - 32) - (off * 64));
-								gem.setType(FlxG.getRandom(gemTypes) as Number);
-								gem.followPath(new FlxPath([point]), 400);
-								moveCount++;
-							}
-						}
-					}
-				}
-			}
+//				if (deleteArray.length == 0) {
+//					FlxG.log("invalid move");
+//				} else {
+//					FlxG.log("valid move");
+//				}
+//			}
+			
+//			if (justMoved && moveCount == 0) {
+//				justMoved = false;
+//				
+//				
+//				if (deleteArray.length == 0) {
+//					FlxG.log("invalid move");
+//				} else {
+//					
+//					
+//					
+//				}
+//			}
 		}
 		
 		private function startLevel():void {
@@ -303,8 +282,9 @@ package
 						adjacent = true;
 					}
 				}
-				
-				if (adjacent) {
+				trace(fsm.currentState);
+				if (adjacent && fsm.currentState.name == "ready") {
+					fsm.input("click");
 					var path:FlxPath = new FlxPath();
 					path.addPoint(target.getMidpoint());
 					selectedGem.followPath(path, 100);
@@ -315,7 +295,7 @@ package
 					target.justMoved = true;
 					moveCount = 2;
 					deselectGem();
-					justMoved = true;
+//					justMoved = true;
 				} else {
 					selectGem(Selected);
 				}
@@ -326,6 +306,173 @@ package
 		public function onGemFinishedMoving(gem:Gem):void
 		{
 			moveCount--;
+			if (moveCount == 0) {
+				fsm.input("endOfMove");
+			}
+		}
+		
+		public function onGemDied(gem:Gem):void {
+			destroyCount--;
+			if (destroyCount == 0) {
+				fsm.input("drop");
+			}
+		}
+		
+		public function checkValidCallback(event:StateEvent):void {
+			trace("checkValid");
+			var deleteArray:Array = [];
+//				trace("Before sort");
+//				for (var i:int = 0; i < 8; i++) {
+//					var s:String = "";
+//					for (var j:int = 0; j < 8; j++) {
+//						s += gems.members[i + (j * 8)].type + " ";
+//					}
+//					trace(s);
+//				}
+			gems.removeSort();
+//				trace("after sort");
+//				for (var i:int = 0; i < 8; i++) {
+//					var s:String = "";
+//					for (var j:int = 0; j < 8; j++) {
+//						s += gems.members[i + (j * 8)].type + " ";
+//					}
+//					trace(s);
+//				}
+			for (var i:int = 0; i < 8; i++) {
+				var xLast:Number = -1;
+				var xCount:Number = 1;
+				var xTempArray:Array = [];
+				
+				var yLast:Number = -1;
+				var yCount:Number = 1;
+				var yTempArray:Array = [];
+				
+				for (var j:int = 0; j < 8; j++) {
+					// Check Columns
+					var index:uint = (i * 8) + j;
+					var type:Number = gems.members[index].type;
+					if (type == xLast) {
+						xCount += 1;
+					} else {
+						if (xCount >= 3) {
+							deleteArray.push(xTempArray);
+						}
+						xLast = type;
+						xCount = 1;
+						xTempArray = [];
+					}
+					xTempArray.push(index);
+					
+					// Check Rows
+					index = i + (j * 8);
+					type = gems.members[index].type;
+					if (type == yLast) {
+						yCount += 1;
+					} else {
+						if (yCount >= 3) {
+							deleteArray.push(yTempArray);
+						}
+						yLast = type;
+						yCount  = 1;
+						yTempArray = [];
+					}
+					yTempArray.push(index);
+				}
+				
+				if (xCount >= 3) {
+					deleteArray.push(xTempArray);
+				}
+				
+				if (yCount >= 3) {
+					deleteArray.push(yTempArray);
+				}
+			}
+			if (deleteArray.length == 0) {
+				trace("invalid");
+				fsm.input("invalid");
+			} else {
+				trace("valid");
+				var t:Transition = fsm.input("valid");
+				t.to.data = deleteArray;
+			}
+		}
+		
+		public function destroyGemsCallback(event:StateEvent):void {
+//			justMoved = true;
+			var deleteArray:Array = event.state.data;
+			var indexArray:Array = [];
+			while(deleteArray.length > 0) {
+				var tempArray:Array = deleteArray.shift();
+				var size:uint = tempArray.length;
+				var special:Boolean = true;
+				while (tempArray.length > 0) {
+					var index:uint = tempArray.shift();
+					if (gems.members[index].bone) {
+						var squareArray:Array = [];
+						squareArray.push(index + 1);
+						squareArray.push(index - 1);
+						squareArray.push(index + 7);
+						squareArray.push(index + 8);
+						squareArray.push(index + 9);
+						squareArray.push(index - 7);
+						squareArray.push(index - 8);
+						squareArray.push(index - 9);
+						deleteArray.push(squareArray);
+					}
+					if (special && size == 4 && gems.members[index].justMoved){
+						special = false;
+						gems.members[index].bone = true;
+					} else if (special && size == 5 && gems.members[index].justMoved){
+						special = false;
+						gems.members[index].cookie = true;
+					} else {
+						destroyCount++;
+						gems.members[index].kill();
+					}
+				}
+			}
+		}
+		
+		public function dropGemsCallback(event:StateEvent):void {
+			gems.members.forEach(function(item:Gem, index:int, array:Array):void {
+				item.justMoved = false;
+			});
+			
+			var size:int = gems.members.length;
+			var colCount:Object = {};
+			var drop:Boolean = false;
+			var tempArray:Array = [];
+			var indexArray:Array = [];
+			var dv:uint = 0;
+			for (var i:int = size - 1, j:int = 0; i >= 0; i--, j++) {
+				var gem:Gem = gems.members[i];
+				if (!gem.alive) {
+					drop = true;
+					indexArray.push(gem.getMidpoint());
+				} else if (drop && gem.alive) {
+					indexArray.push(gem.getMidpoint());
+					gem.followPath(new FlxPath([indexArray.shift()]), 400);
+					moveCount++;
+				}
+				
+				if (j == 7) {
+					drop = false;
+					j = -1;
+					var indexLength:int = indexArray.length;
+					
+					for (var k:int = 0; k < indexLength; k++) {
+						gem = gems.recycle() as Gem;
+						var point:FlxPoint = indexArray.shift();
+						var n:int  = k + 1;
+						var c:int = 2 * indexLength + 3;
+						var off:int = (c * n - n * n) / 2;
+						gem.reset(point.x - 32, (point.y - 32) - (off * 64));
+						gem.setType(FlxG.getRandom(gemTypes) as Number);
+						gem.followPath(new FlxPath([point]), 400);
+						moveCount++;
+					}
+				}
+			}
 		}
 	}
 }
