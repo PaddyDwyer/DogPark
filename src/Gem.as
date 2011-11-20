@@ -25,6 +25,8 @@ package
 		[Embed(source="data/pug.png")] private var ImgPug:Class;
 		[Embed(source="data/pugbone.png")] private var ImgPugBone:Class;
 		[Embed(source="data/pugcookie.png")] private var ImgPugCookie:Class;
+		// Source http://www.pacdv.com/sounds/fart-sounds.html
+		[Embed(source="data/fart.mp3")] private var SndFart:Class;
 		
 		public var type:Number;
 		public var status:uint;
@@ -46,6 +48,7 @@ package
 		private var state:PlayState;
 		private var _bone:Boolean;
 		private var _cookie:Boolean;
+		private var _fart:FlxSound;
 		
 		public function Gem(X:Number, Y:Number, Type:Number, State:PlayState, Index:uint)
 		{
@@ -69,10 +72,11 @@ package
 			frame = 0;
 			
 //			if (Type == BOSTON) {
-				addAnimation("farty", [1, 2, 3, 4, 5], 30);
+				addAnimation("farty", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 15);
 				addAnimationCallback(endFart);
 //			}
 
+			_fart = FlxG.loadSound(SndFart);
 			type = Type;
 			velocity.y = 400;
 			initialized = false;
@@ -124,12 +128,13 @@ package
 		
 		override public function kill():void {
 			play("farty");
+			_fart.play();
 //			state.onGemDied(this);
 //			super.kill();
 		}
 		
 		private function endFart(name:String, frameNo:uint, frameIdx:uint):void {
-			if (name == "farty" && frameIdx == 5) {
+			if (name == "farty" && frameIdx == 10) {
 				state.onGemDied(this);
 				super.kill();
 			}

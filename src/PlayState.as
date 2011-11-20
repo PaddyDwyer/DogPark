@@ -57,7 +57,7 @@ package
 		
 		override public function create():void {
 //			FlxG.globalSeed = 0.7796059045940638;
-			FlxG.globalSeed = 0.1358598880469799;
+//			FlxG.globalSeed = 0.1358598880469799;
 //			FlxG.log("starting seed: " + FlxG.globalSeed);
 			
 			var background:FlxSprite = new FlxSprite(0, 0);
