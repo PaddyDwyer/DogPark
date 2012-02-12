@@ -27,6 +27,7 @@ package
 		[Embed(source="data/pugcookie.png")] private var ImgPugCookie:Class;
 		[Embed(source="data/sharpei.png")] private var ImgSharpei:Class;
 		[Embed(source="data/sharpeibone.png")] private var ImgSharpeiBone:Class;
+		[Embed(source="data/ball.png")] private var ImgBall:Class;
 		
 		// Source http://www.pacdv.com/sounds/fart-sounds.html
 		[Embed(source="data/fart.mp3")] private var SndFart:Class;
