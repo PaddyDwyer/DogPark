@@ -25,6 +25,9 @@ package
 		[Embed(source="data/pug.png")] private var ImgPug:Class;
 		[Embed(source="data/pugbone.png")] private var ImgPugBone:Class;
 		[Embed(source="data/pugcookie.png")] private var ImgPugCookie:Class;
+		[Embed(source="data/sharpei.png")] private var ImgSharpei:Class;
+		[Embed(source="data/sharpeibone.png")] private var ImgSharpeiBone:Class;
+		
 		// Source http://www.pacdv.com/sounds/fart-sounds.html
 		[Embed(source="data/fart.mp3")] private var SndFart:Class;
 		
@@ -40,6 +43,7 @@ package
 		public static const ENGLISH:Number = 3;
 		public static const FRENCHY:Number = 4;
 		public static const PUG:Number = 5;
+		public static const SHARPEI:Number = 6;
 		
 		public static const NORMAL:uint = 0;
 		public static const PRESSED:uint = 1;
@@ -66,6 +70,8 @@ package
 				img = ImgFrenchy;
 			} else if (Type == PUG) {
 				img = ImgPug;
+			} else if (Type == SHARPEI) {
+				img = ImgSharpei;
 			}
 			
 			loadGraphic(img, true, false, 64, 64);
@@ -178,6 +184,8 @@ package
 					img = ImgFrenchyBone;
 				} else if (type == PUG) {
 					img = ImgPugBone;
+				} else if (type == SHARPEI) {
+					img = ImgSharpeiBone;
 				}
 				loadGraphic(img, true, false, 64, 64);
 				frame = 0;
@@ -238,6 +246,8 @@ package
 				img = ImgFrenchy;
 			} else if (Type == PUG) {
 				img = ImgPug;
+			} else if (Type == SHARPEI) {
+				img = ImgSharpei;
 			}
 			loadGraphic(img, true, false, 64, 64);
 			frame = 0;
