@@ -121,94 +121,6 @@ package
 			super.update();
 			GemCollision.collide(gems, map);
 			GemCollision.collide(gems, gems);
-			
-//			if (fsm.currentState.name == "checkValid") {
-//				var deleteArray:Array = [];
-////				trace("Before sort");
-////				for (var i:int = 0; i < 8; i++) {
-////					var s:String = "";
-////					for (var j:int = 0; j < 8; j++) {
-////						s += gems.members[i + (j * 8)].type + " ";
-////					}
-////					trace(s);
-////				}
-//				gems.removeSort();
-////				trace("after sort");
-////				for (var i:int = 0; i < 8; i++) {
-////					var s:String = "";
-////					for (var j:int = 0; j < 8; j++) {
-////						s += gems.members[i + (j * 8)].type + " ";
-////					}
-////					trace(s);
-////				}
-//				for (var i:int = 0; i < 8; i++) {
-//					var xLast:Number = -1;
-//					var xCount:Number = 1;
-//					var xTempArray:Array = [];
-//					
-//					var yLast:Number = -1;
-//					var yCount:Number = 1;
-//					var yTempArray:Array = [];
-//					
-//					for (var j:int = 0; j < 8; j++) {
-//						// Check Columns
-//						var index:uint = (i * 8) + j;
-//						var type:Number = gems.members[index].type;
-//						if (type == xLast) {
-//							xCount += 1;
-//						} else {
-//							if (xCount >= 3) {
-//								deleteArray.push(xTempArray);
-//							}
-//							xLast = type;
-//							xCount = 1;
-//							xTempArray = [];
-//						}
-//						xTempArray.push(index);
-//						
-//						// Check Rows
-//						index = i + (j * 8);
-//						type = gems.members[index].type;
-//						if (type == yLast) {
-//							yCount += 1;
-//						} else {
-//							if (yCount >= 3) {
-//								deleteArray.push(yTempArray);
-//							}
-//							yLast = type;
-//							yCount  = 1;
-//							yTempArray = [];
-//						}
-//						yTempArray.push(index);
-//					}
-//					
-//					if (xCount >= 3) {
-//						deleteArray.push(xTempArray);
-//					}
-//					
-//					if (yCount >= 3) {
-//						deleteArray.push(yTempArray);
-//					}
-//				}
-//				if (deleteArray.length == 0) {
-//					FlxG.log("invalid move");
-//				} else {
-//					FlxG.log("valid move");
-//				}
-//			}
-			
-//			if (justMoved && moveCount == 0) {
-//				justMoved = false;
-//				
-//				
-//				if (deleteArray.length == 0) {
-//					FlxG.log("invalid move");
-//				} else {
-//					
-//					
-//					
-//				}
-//			}
 		}
 		
 		private function startLevel():void {
@@ -425,7 +337,7 @@ package
 						gems.members[index].bone = true;
 					} else if (special && size == 5 && gems.members[index].justMoved){
 						special = false;
-						gems.members[index].cookie = true;
+						gems.members[index].ball = true;
 					} else {
 						destroyCount++;
 						gems.members[index].kill();

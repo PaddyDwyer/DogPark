@@ -52,7 +52,7 @@ package
 		private var initialized:Boolean;
 		private var state:PlayState;
 		private var _bone:Boolean;
-		private var _cookie:Boolean;
+		private var _ball:Boolean;
 		private var _fart:FlxSound;
 		
 		public function Gem(X:Number, Y:Number, Type:Number, State:PlayState, Index:uint)
@@ -198,26 +198,13 @@ package
 			return _bone;
 		}
 		
-		public function set cookie(cookie:Boolean):void {
-			var img:Class = null;
-			if (cookie) {
-				if (type == BOSTON) {
-					img = ImgBostonCookie;
-				} else if (type == BULLTERRIER) {
-					img = ImgBullTerrierCookie;
-				} else if (type == BOXER) {
-					img = ImgBoxerCookie;
-				} else if (type == ENGLISH) {
-					img = ImgEnglishCookie;
-				} else if (type == FRENCHY) {
-					img = ImgFrenchyCookie;
-				} else if (type == PUG) {
-					img = ImgPugCookie;
-				}
+		public function set ball(ball:Boolean):void {
+			if (ball) {
+				var img:Class = ImgBall;
 				loadGraphic(img, true, false, 64, 64);
 				frame = 0;
 			}
-			_cookie = cookie;
+			_ball = ball;
 		}
 		
 		override public function toString():String {
@@ -227,7 +214,7 @@ package
 		
 		override public function revive():void {
 			super.revive();
-			_cookie = false;
+			_ball = false;
 			_bone = false;
 		}
 		
