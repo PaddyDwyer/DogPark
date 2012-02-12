@@ -404,6 +404,7 @@ package
 			while(deleteArray.length > 0) {
 				var tempArray:Array = deleteArray.shift();
 				var size:uint = tempArray.length;
+				// The special boolean is used to determine if a special gem has been created yet. once a special gem is created, it's set to false
 				var special:Boolean = true;
 				while (tempArray.length > 0) {
 					var index:uint = tempArray.shift();
