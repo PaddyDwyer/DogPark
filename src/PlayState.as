@@ -25,6 +25,13 @@ package
 		private var justMoved:Boolean;
 		private var fsm:FSMachine;
 		
+		private static const FSM_SC_INITIALIZE:String = "initialize";
+		private static const FSM_SC_CLICK:String = "click";
+		private static const FSM_SC_END_OF_MOVE:String = "endOfMove";
+		private static const FSM_SC_VALID:String = "valid";
+		private static const FSM_SC_INVALID:String = "invalid";
+		private static const FSM_SC_DROP:String = "drop";
+		
 		private var data:Array = new Array(
 			3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 			3, 3, 3, 3, 3, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6, 3,
@@ -56,9 +63,8 @@ package
 		}
 		
 		override public function create():void {
-//			FlxG.globalSeed = 0.7796059045940638;
-//			FlxG.globalSeed = 0.1358598880469799;
-//			FlxG.log("starting seed: " + FlxG.globalSeed);
+			FlxG.globalSeed = 0.9490438620559871;
+			FlxG.log("starting seed: " + FlxG.globalSeed);
 			
 			var background:FlxSprite = new FlxSprite(0, 0);
 			background.makeGraphic(768, 640, 0xffffffff);
@@ -98,25 +104,27 @@ package
 			var dropGems:State = fsm.createState("dropGems");
 			var dropCheckValid:State = fsm.createState("dropCheckValid");
 			
-			var initialize:Transition = fsm.createTransition(start, ready, "initialize", "start2ready");
-			var click:Transition = fsm.createTransition(ready, moving, "click", "ready2moving");
-			var endOfMove:Transition = fsm.createTransition(moving, checkValid, "endOfMove", "moving2checkValid");
-			var validMove:Transition = fsm.createTransition(checkValid, destroyGems, "valid", "checkValid2destroyGems", 0.05);
-			var invalidMove:Transition = fsm.createTransition(checkValid, ready, "invalid", "checkValid2undoMove");
-			var droppingGems:Transition = fsm.createTransition(destroyGems, dropGems, "drop", "destroy2drop", 0.05);
-			var dropEndOfMove:Transition = fsm.createTransition(dropGems, dropCheckValid, "endOfMove", "dropGems2checkValid");
-			var dropValid:Transition = fsm.createTransition(dropCheckValid, destroyGems, "valid", "dropCheckValid2destroyGems", 0.05);
-			var dropInvalid:Transition = fsm.createTransition(dropCheckValid, ready, "invalid", "dropInvalid2ready");
+			var initialize:Transition = fsm.createTransition(start, ready, FSM_SC_INITIALIZE, "start2ready");
+			var click:Transition = fsm.createTransition(ready, moving, FSM_SC_CLICK, "ready2moving");
+			var endOfMove:Transition = fsm.createTransition(moving, checkValid, FSM_SC_END_OF_MOVE, "moving2checkValid");
+			var validMove:Transition = fsm.createTransition(checkValid, destroyGems, FSM_SC_VALID, "checkValid2destroyGems", 0.05);
+			var invalidMove:Transition = fsm.createTransition(checkValid, ready, FSM_SC_INVALID, "checkValid2undoMove");
+			var droppingGems:Transition = fsm.createTransition(destroyGems, dropGems, FSM_SC_DROP, "destroy2drop", 0.05);
+			var dropEndOfMove:Transition = fsm.createTransition(dropGems, dropCheckValid, FSM_SC_END_OF_MOVE, "dropGems2checkValid");
+			var dropValid:Transition = fsm.createTransition(dropCheckValid, destroyGems, FSM_SC_VALID, "dropCheckValid2destroyGems", 0.05);
+			var dropInvalid:Transition = fsm.createTransition(dropCheckValid, ready, FSM_SC_INVALID, "dropInvalid2ready");
 			
 			checkValid.addEventListener(StateEvent.ENTER, checkValidCallback, false, 0, true);
 			destroyGems.addEventListener(StateEvent.ENTER, destroyGemsCallback, false, 0, true);
 			dropGems.addEventListener(StateEvent.ENTER, dropGemsCallback, false, 0, true);
 			dropCheckValid.addEventListener(StateEvent.ENTER, checkValidCallback, false, 0, true);
+			ready.addEventListener(StateEvent.ENTER, endOfMoveCallback, false, 0, true);
+			destroyGems.addEventListener(StateEvent.EXIT, endOfMoveCallback, false, 0, true);
 		}
 				
 		override public function update():void {
 			if (fsm.currentState.name == "start" && FlxG.stage != null) {
-				fsm.input("initialize");
+				fsm.input(FSM_SC_INITIALIZE);
 			}
 			super.update();
 			GemCollision.collide(gems, map);
@@ -196,7 +204,7 @@ package
 				}
 				trace(fsm.currentState);
 				if (adjacent && fsm.currentState.name == "ready") {
-					fsm.input("click");
+					fsm.input(FSM_SC_CLICK);
 					var path:FlxPath = new FlxPath();
 					path.addPoint(target.getMidpoint());
 					selectedGem.followPath(path, 100);
@@ -207,7 +215,6 @@ package
 					target.justMoved = true;
 					moveCount = 2;
 					deselectGem();
-//					justMoved = true;
 				} else {
 					selectGem(Selected);
 				}
@@ -219,14 +226,14 @@ package
 		{
 			moveCount--;
 			if (moveCount == 0) {
-				fsm.input("endOfMove");
+				fsm.input(FSM_SC_END_OF_MOVE);
 			}
 		}
 		
 		public function onGemDied(gem:Gem):void {
 			destroyCount--;
 			if (destroyCount == 0) {
-				fsm.input("drop");
+				fsm.input(FSM_SC_DROP);
 			}
 		}
 		
@@ -242,6 +249,24 @@ package
 //					trace(s);
 //				}
 			gems.removeSort();
+			var moveArray:Array = [];
+			gems.members.forEach(function(item:Gem, index:int, array:Array):void {
+				if (item.justMoved) {
+					moveArray.push(item);
+				}
+			});
+			if (moveArray.length == 2 && (moveArray[0].type == Gem.BALL || moveArray[1].type == Gem.BALL)) {
+				var tempArray:Array = []
+				var type:Number = (moveArray[0].type + moveArray[1].type - Gem.BALL);
+				trace("killtype", type);
+				gems.members.forEach(function(item:Gem, index:int, array:Array):void {
+					if (item.type == type || item.type == Gem.BALL) {
+						tempArray.push(index);
+					}
+				});
+				trace("deletes", tempArray);
+				deleteArray.push(tempArray);
+			} else {
 //				trace("after sort");
 //				for (var i:int = 0; i < 8; i++) {
 //					var s:String = "";
@@ -250,61 +275,62 @@ package
 //					}
 //					trace(s);
 //				}
-			for (var i:int = 0; i < 8; i++) {
-				var xLast:Number = -1;
-				var xCount:Number = 1;
-				var xTempArray:Array = [];
-				
-				var yLast:Number = -1;
-				var yCount:Number = 1;
-				var yTempArray:Array = [];
-				
-				for (var j:int = 0; j < 8; j++) {
-					// Check Columns
-					var index:uint = (i * 8) + j;
-					var type:Number = gems.members[index].type;
-					if (type == xLast) {
-						xCount += 1;
-					} else {
-						if (xCount >= 3) {
-							deleteArray.push(xTempArray);
-						}
-						xLast = type;
-						xCount = 1;
-						xTempArray = [];
-					}
-					xTempArray.push(index);
+				for (var i:int = 0; i < 8; i++) {
+					var xLast:Number = -1;
+					var xCount:Number = 1;
+					var xTempArray:Array = [];
 					
-					// Check Rows
-					index = i + (j * 8);
-					type = gems.members[index].type;
-					if (type == yLast) {
-						yCount += 1;
-					} else {
-						if (yCount >= 3) {
-							deleteArray.push(yTempArray);
+					var yLast:Number = -1;
+					var yCount:Number = 1;
+					var yTempArray:Array = [];
+					
+					for (var j:int = 0; j < 8; j++) {
+						// Check Columns
+						var index:uint = (i * 8) + j;
+						type = gems.members[index].type;
+						if (type == xLast) {
+							xCount += 1;
+						} else {
+							if (xCount >= 3) {
+								deleteArray.push(xTempArray);
+							}
+							xLast = type;
+							xCount = 1;
+							xTempArray = [];
 						}
-						yLast = type;
-						yCount  = 1;
-						yTempArray = [];
+						xTempArray.push(index);
+						
+						// Check Rows
+						index = i + (j * 8);
+						type = gems.members[index].type;
+						if (type == yLast) {
+							yCount += 1;
+						} else {
+							if (yCount >= 3) {
+								deleteArray.push(yTempArray);
+							}
+							yLast = type;
+							yCount  = 1;
+							yTempArray = [];
+						}
+						yTempArray.push(index);
 					}
-					yTempArray.push(index);
-				}
-				
-				if (xCount >= 3) {
-					deleteArray.push(xTempArray);
-				}
-				
-				if (yCount >= 3) {
-					deleteArray.push(yTempArray);
+					
+					if (xCount >= 3) {
+						deleteArray.push(xTempArray);
+					}
+					
+					if (yCount >= 3) {
+						deleteArray.push(yTempArray);
+					}
 				}
 			}
 			if (deleteArray.length == 0) {
-				trace("invalid");
-				fsm.input("invalid");
+				trace(FSM_SC_INVALID);
+				fsm.input(FSM_SC_INVALID);
 			} else {
-				trace("valid");
-				var t:Transition = fsm.input("valid");
+				trace(FSM_SC_VALID);
+				var t:Transition = fsm.input(FSM_SC_VALID);
 				t.to.data = deleteArray;
 			}
 		}
@@ -332,12 +358,12 @@ package
 						squareArray.push(index - 9);
 						deleteArray.push(squareArray);
 					}
-					if (special && size == 4 && gems.members[index].justMoved){
+					if (special && size == 4 && gems.members[index].justMoved == true){
 						special = false;
 						gems.members[index].bone = true;
-					} else if (special && size == 5 && gems.members[index].justMoved){
+					} else if (special && size == 5 && gems.members[index].justMoved == true){
 						special = false;
-						gems.members[index].ball = true;
+						gems.members[index].setType(Gem.BALL);
 					} else {
 						destroyCount++;
 						gems.members[index].kill();
@@ -347,10 +373,6 @@ package
 		}
 		
 		public function dropGemsCallback(event:StateEvent):void {
-			gems.members.forEach(function(item:Gem, index:int, array:Array):void {
-				item.justMoved = false;
-			});
-			
 			var size:int = gems.members.length;
 			var colCount:Object = {};
 			var drop:Boolean = false;
@@ -365,6 +387,7 @@ package
 				} else if (drop && gem.alive) {
 					indexArray.push(gem.getMidpoint());
 					gem.followPath(new FlxPath([indexArray.shift()]), 400);
+					gem.justMoved = true;
 					moveCount++;
 				}
 				
@@ -382,10 +405,17 @@ package
 						gem.reset(point.x - 32, (point.y - 32) - (off * 64));
 						gem.setType(FlxG.getRandom(gemTypes) as Number);
 						gem.followPath(new FlxPath([point]), 400);
+						gem.justMoved = true;
 						moveCount++;
 					}
 				}
 			}
+		}
+		
+		public function endOfMoveCallback(event:StateEvent):void {
+			gems.members.forEach(function(item:Gem, index:int, array:Array):void {
+				item.justMoved = false;
+			});
 		}
 	}
 }

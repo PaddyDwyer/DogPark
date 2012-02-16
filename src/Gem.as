@@ -36,7 +36,7 @@ package
 		public var status:uint;
 		public var idx:uint;
 		public var targetIdx:Number;
-		public var justMoved:Boolean = true;
+		public var justMoved:Boolean = false;
 		
 		public static const BOSTON:Number = 0;
 		public static const BULLTERRIER:Number = 1;
@@ -45,6 +45,7 @@ package
 		public static const FRENCHY:Number = 4;
 		public static const PUG:Number = 5;
 		public static const SHARPEI:Number = 6;
+		public static const BALL:Number = 7;
 		
 		public static const NORMAL:uint = 0;
 		public static const PRESSED:uint = 1;
@@ -52,7 +53,6 @@ package
 		private var initialized:Boolean;
 		private var state:PlayState;
 		private var _bone:Boolean;
-		private var _ball:Boolean;
 		private var _fart:FlxSound;
 		
 		public function Gem(X:Number, Y:Number, Type:Number, State:PlayState, Index:uint)
@@ -198,15 +198,6 @@ package
 			return _bone;
 		}
 		
-		public function set ball(ball:Boolean):void {
-			if (ball) {
-				var img:Class = ImgBall;
-				loadGraphic(img, true, false, 64, 64);
-				frame = 0;
-			}
-			_ball = ball;
-		}
-		
 		override public function toString():String {
 //			return "Gem - Left: " + left + ", Top: " + top + ", Right: " + right + ", Bottom: " + bottom;
 			return type.toString();
@@ -214,7 +205,6 @@ package
 		
 		override public function revive():void {
 			super.revive();
-			_ball = false;
 			_bone = false;
 		}
 		
@@ -236,6 +226,8 @@ package
 				img = ImgPug;
 			} else if (Type == SHARPEI) {
 				img = ImgSharpei;
+			} else if (Type == BALL) {
+				img = ImgBall;
 			}
 			loadGraphic(img, true, false, 64, 64);
 			frame = 0;
