@@ -24,6 +24,7 @@ package
 		private var destroyCount:int = 0;
 		private var justMoved:Boolean;
 		private var fsm:FSMachine;
+		private var scoreHolder:ScoreHolder;
 		
 		private static const FSM_SC_INITIALIZE:String = "initialize";
 		private static const FSM_SC_CLICK:String = "click";
@@ -87,6 +88,9 @@ package
 			add(selectBox);
 			
 			gemTypes = [Gem.BOSTON, Gem.BULLTERRIER, Gem.BOXER, Gem.ENGLISH, Gem.FRENCHY, Gem.PUG, Gem.SHARPEI];
+			
+			scoreHolder = new ScoreHolder();
+			add(scoreHolder);
 			
 			setUpFSM();
 			
@@ -342,6 +346,15 @@ package
 			while(deleteArray.length > 0) {
 				var tempArray:Array = deleteArray.shift();
 				var size:uint = tempArray.length;
+//				trace("size", size);
+//				if (size == 3) {
+//					scoreHolder.addScore(10);
+//				} else if (size == 4) {
+//					scoreHolder.addScore(20);
+//				} else if (size == 5) {
+//					scoreHolder.addScore(30);
+//				}
+				
 				// The special boolean is used to determine if a special gem has been created yet. once a special gem is created, it's set to false
 				var special:Boolean = true;
 				while (tempArray.length > 0) {
