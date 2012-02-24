@@ -1,26 +1,27 @@
 package
 {
-	import org.flixel.FlxGroup;
-	
-	public class ScoreArray extends FlxGroup
+	public class ScoreArray
 	{
 		private var ary:Array;
 		private var hasBone:Boolean;
 		private var hasBall:Boolean;
 		
-		public function ScoreArray(MaxSize:uint=0)
+		public function ScoreArray()
 		{
-			super(MaxSize);
 			ary = [];
 		}
 		
-		public function add(gem:Gem):void {
+		public function add(index:uint, gem:Gem):void {
 			if (gem.bone) {
 				hasBone = true;
 			} else if (gem.ball) {
 				hasBall = true;
 			}
-			ary.push(gem);
+			ary.push(index);
+		}
+		
+		public function get array():Array {
+			return ary;
 		}
 	}
 }

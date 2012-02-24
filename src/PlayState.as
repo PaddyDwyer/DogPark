@@ -260,12 +260,12 @@ package
 				}
 			});
 			if (moveArray.length == 2 && (moveArray[0].type == Gem.BALL || moveArray[1].type == Gem.BALL)) {
-				var tempArray:Array = []
+				var tempArray:ScoreArray = new ScoreArray();
 				var type:Number = (moveArray[0].type + moveArray[1].type - Gem.BALL);
 				trace("killtype", type);
 				gems.members.forEach(function(item:Gem, index:int, array:Array):void {
 					if (item.type == type || item.type == Gem.BALL) {
-						tempArray.push(index);
+						tempArray.add(index, item);
 					}
 				});
 				trace("deletes", tempArray);
@@ -282,11 +282,11 @@ package
 				for (var i:int = 0; i < 8; i++) {
 					var xLast:Number = -1;
 					var xCount:Number = 1;
-					var xTempArray:Array = [];
+					var xTempArray:ScoreArray = new ScoreArray();
 					
 					var yLast:Number = -1;
 					var yCount:Number = 1;
-					var yTempArray:Array = [];
+					var yTempArray:ScoreArray = new ScoreArray();
 					
 					for (var j:int = 0; j < 8; j++) {
 						// Check Columns
@@ -300,9 +300,9 @@ package
 							}
 							xLast = type;
 							xCount = 1;
-							xTempArray = [];
+							xTempArray = new ScoreArray();
 						}
-						xTempArray.push(index);
+						xTempArray.add(index, gems.members[index]);
 						
 						// Check Rows
 						index = i + (j * 8);
@@ -315,9 +315,9 @@ package
 							}
 							yLast = type;
 							yCount  = 1;
-							yTempArray = [];
+							yTempArray = new ScoreArray();
 						}
-						yTempArray.push(index);
+						yTempArray.add(index, gems.members[index]);
 					}
 					
 					if (xCount >= 3) {
@@ -344,7 +344,7 @@ package
 			var deleteArray:Array = event.state.data;
 			var indexArray:Array = [];
 			while(deleteArray.length > 0) {
-				var tempArray:Array = deleteArray.shift();
+				var tempArray:Array = deleteArray.shift().array;
 				var size:uint = tempArray.length;
 //				trace("size", size);
 //				if (size == 3) {
@@ -360,15 +360,15 @@ package
 				while (tempArray.length > 0) {
 					var index:uint = tempArray.shift();
 					if (gems.members[index].bone) {
-						var squareArray:Array = [];
-						squareArray.push(index + 1);
-						squareArray.push(index - 1);
-						squareArray.push(index + 7);
-						squareArray.push(index + 8);
-						squareArray.push(index + 9);
-						squareArray.push(index - 7);
-						squareArray.push(index - 8);
-						squareArray.push(index - 9);
+						var squareArray:ScoreArray = new ScoreArray();
+						squareArray.add(index + 1, gems.members[index]);
+						squareArray.add(index - 1, gems.members[index]);
+						squareArray.add(index + 7, gems.members[index]);
+						squareArray.add(index + 8, gems.members[index]);
+						squareArray.add(index + 9, gems.members[index]);
+						squareArray.add(index - 7, gems.members[index]);
+						squareArray.add(index - 8, gems.members[index]);
+						squareArray.add(index - 9, gems.members[index]);
 						deleteArray.push(squareArray);
 					}
 					if (special && size == 4 && gems.members[index].justMoved == true){
