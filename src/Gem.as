@@ -53,6 +53,7 @@ package
 		private var initialized:Boolean;
 		private var state:PlayState;
 		private var _bone:Boolean;
+		private var _ball:Boolean;
 		private var _fart:FlxSound;
 		
 		public function Gem(X:Number, Y:Number, Type:Number, State:PlayState, Index:uint)
@@ -198,6 +199,10 @@ package
 			return _bone;
 		}
 		
+		public function get ball():Boolean {
+			return _ball;
+		}
+		
 		override public function toString():String {
 //			return "Gem - Left: " + left + ", Top: " + top + ", Right: " + right + ", Bottom: " + bottom;
 			return type.toString();
@@ -228,6 +233,7 @@ package
 				img = ImgSharpei;
 			} else if (Type == BALL) {
 				img = ImgBall;
+				_ball = true;
 			}
 			loadGraphic(img, true, false, 64, 64);
 			frame = 0;
