@@ -365,10 +365,6 @@ package
 				var special:Boolean = true;
 				while (tempArray.length > 0) {
 					var index:uint = tempArray.shift();
-					if (gems.members[index].bone) {
-						var squareArray:ScoreArray = new ScoreArray();
-						deleteArray.push(squareArray);
-					}
 					if (special && size == 4 && gems.members[index].justMoved == true){
 						special = false;
 						gems.members[index].bone = true;
