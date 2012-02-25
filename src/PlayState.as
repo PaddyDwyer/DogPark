@@ -123,6 +123,7 @@ package
 			dropGems.addEventListener(StateEvent.ENTER, dropGemsCallback, false, 0, true);
 			dropCheckValid.addEventListener(StateEvent.ENTER, checkValidCallback, false, 0, true);
 			ready.addEventListener(StateEvent.ENTER, endOfMoveCallback, false, 0, true);
+			ready.addEventListener(StateEvent.ENTER, readyCallback, false, 0, true);
 			destroyGems.addEventListener(StateEvent.EXIT, endOfMoveCallback, false, 0, true);
 		}
 				
@@ -338,22 +339,27 @@ package
 			}
 		}
 		
+		private function blowUpBone(index:uint, squareArray:Array):void {
+			squareArray.add(index + 1, gems.members[index]);
+			squareArray.add(index - 1, gems.members[index]);
+			squareArray.add(index + 7, gems.members[index]);
+			squareArray.add(index + 8, gems.members[index]);
+			squareArray.add(index + 9, gems.members[index]);
+			squareArray.add(index - 7, gems.members[index]);
+			squareArray.add(index - 8, gems.members[index]);
+			squareArray.add(index - 9, gems.members[index]);
+		}
+		
 		public function destroyGemsCallback(event:StateEvent):void {
 			trace("destroy gems");
 //			justMoved = true;
 			var deleteArray:Array = event.state.data;
 			var indexArray:Array = [];
 			while(deleteArray.length > 0) {
-				var tempArray:Array = deleteArray.shift().array;
+				var scoreArray:ScoreArray = deleteArray.shift();
+				scoreHolder.addScore(scoreArray);
+				var tempArray:Array = scoreArray.array;
 				var size:uint = tempArray.length;
-//				trace("size", size);
-//				if (size == 3) {
-//					scoreHolder.addScore(10);
-//				} else if (size == 4) {
-//					scoreHolder.addScore(20);
-//				} else if (size == 5) {
-//					scoreHolder.addScore(30);
-//				}
 				
 				// The special boolean is used to determine if a special gem has been created yet. once a special gem is created, it's set to false
 				var special:Boolean = true;
@@ -361,14 +367,6 @@ package
 					var index:uint = tempArray.shift();
 					if (gems.members[index].bone) {
 						var squareArray:ScoreArray = new ScoreArray();
-						squareArray.add(index + 1, gems.members[index]);
-						squareArray.add(index - 1, gems.members[index]);
-						squareArray.add(index + 7, gems.members[index]);
-						squareArray.add(index + 8, gems.members[index]);
-						squareArray.add(index + 9, gems.members[index]);
-						squareArray.add(index - 7, gems.members[index]);
-						squareArray.add(index - 8, gems.members[index]);
-						squareArray.add(index - 9, gems.members[index]);
 						deleteArray.push(squareArray);
 					}
 					if (special && size == 4 && gems.members[index].justMoved == true){
@@ -433,6 +431,10 @@ package
 			gems.members.forEach(function(item:Gem, index:int, array:Array):void {
 				item.justMoved = false;
 			});
+		}
+		
+		public function readyCallback(event:StateEvent):void {
+			scoreHolder.reset();
 		}
 	}
 }
