@@ -55,6 +55,7 @@ package
 		private var _bone:Boolean;
 		private var _ball:Boolean;
 		private var _fart:FlxSound;
+		private var _dying:Boolean;
 		
 		public function Gem(X:Number, Y:Number, Type:Number, State:PlayState, Index:uint)
 		{
@@ -90,6 +91,7 @@ package
 			initialized = false;
 			state = State;
 			targetIdx = Index;
+			_dying = false;
 		}
 		
 		override public function preUpdate():void {
@@ -137,6 +139,7 @@ package
 		override public function kill():void {
 			play("farty");
 			_fart.play();
+			_dying = true;
 //			state.onGemDied(this);
 //			super.kill();
 		}
@@ -144,6 +147,7 @@ package
 		private function endFart(name:String, frameNo:uint, frameIdx:uint):void {
 			if (name == "farty" && frameIdx == 10) {
 				state.onGemDied(this);
+				_dying = false;
 				super.kill();
 			}
 		}
@@ -169,6 +173,10 @@ package
 		
 		public function get bottom():Number {
 			return y + height;
+		}
+		
+		public function get dying():Boolean {
+			return _dying;
 		}
 		
 		public function set bone(bone:Boolean):void {

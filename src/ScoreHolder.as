@@ -24,7 +24,6 @@ package
 		}
 		
 		override public function draw():void {
-			trace("drawing");
 			super.draw();
 			
 			_scoreLabel.draw();

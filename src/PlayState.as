@@ -235,6 +235,7 @@ package
 		}
 		
 		public function onGemDied(gem:Gem):void {
+			trace("gem died");
 			destroyCount--;
 			if (destroyCount == 0) {
 				fsm.input(FSM_SC_DROP);
@@ -262,13 +263,11 @@ package
 			if (moveArray.length == 2 && (moveArray[0].type == Gem.BALL || moveArray[1].type == Gem.BALL)) {
 				var tempArray:ScoreArray = new ScoreArray();
 				var type:Number = (moveArray[0].type + moveArray[1].type - Gem.BALL);
-				trace("killtype", type);
 				gems.members.forEach(function(item:Gem, index:int, array:Array):void {
 					if (item.type == type || item.type == Gem.BALL) {
 						tempArray.add(index, item);
 					}
 				});
-				trace("deletes", tempArray);
 				deleteArray.push(tempArray);
 			} else {
 //				trace("after sort");
@@ -340,6 +339,7 @@ package
 		}
 		
 		public function destroyGemsCallback(event:StateEvent):void {
+			trace("destroy gems");
 //			justMoved = true;
 			var deleteArray:Array = event.state.data;
 			var indexArray:Array = [];
@@ -378,14 +378,17 @@ package
 						special = false;
 						gems.members[index].setType(Gem.BALL);
 					} else {
-						destroyCount++;
-						gems.members[index].kill();
+						if (!gems.members[index].dying) {
+							destroyCount++;
+							gems.members[index].kill();
+						}
 					}
 				}
 			}
 		}
 		
 		public function dropGemsCallback(event:StateEvent):void {
+			trace("dropgems");
 			var size:int = gems.members.length;
 			var colCount:Object = {};
 			var drop:Boolean = false;
@@ -399,7 +402,8 @@ package
 					indexArray.push(gem.getMidpoint());
 				} else if (drop && gem.alive) {
 					indexArray.push(gem.getMidpoint());
-					gem.followPath(new FlxPath([indexArray.shift()]), 400);
+					var midpoint:FlxPoint = indexArray.shift();
+					gem.followPath(new FlxPath([midpoint]), 400);
 					gem.justMoved = true;
 					moveCount++;
 				}
